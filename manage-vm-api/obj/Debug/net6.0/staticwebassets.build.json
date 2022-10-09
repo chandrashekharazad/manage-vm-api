@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "hnkhOV/dzX/ib529on788F0V60bgsIqBs+vk5W8VHpY=",
+  "Source": "manage-vm-api",
+  "BasePath": "_content/manage-vm-api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
