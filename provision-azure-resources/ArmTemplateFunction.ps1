@@ -1,20 +1,22 @@
 function ArmTemplateFunction{
     param(
-    # #    [parameter(mandatory =$false)]
-    # #    [string]$adminusername,
-    # #    [parameter(mandatory =$false)]
-    # #    [string]$adminpassword,
-    # #    [parameter(mandatory =$false)]
-    # #    [string]$resourcegroup,
-    # [parameter(mandatory =$true)]
-    # [string]$location,
-    # #    [parameter(mandatory =$false)]
-    # #    [string[]]$vmnames,
-    # #    [parameter(mandatory =$false)]
-    # #    [string]$targetsubscription,
-    # #    [parameter(mandatory =$false)]
-    # #    [bool]$whatif = $true
+   [parameter(mandatory =$true)]
+    [string]$adminusername,
+    [parameter(mandatory =$true)]
+    [string]$adminpassword,
+    [parameter(mandatory =$true)]
+   [string]$resourcegroup,
+    [parameter(mandatory =$true)]
+    [string]$location,
+    [parameter(mandatory =$true)]
+    [string]$vmnames,
+    [parameter(mandatory =$false)]
+    [string]$targetsubscription,
+    [parameter(mandatory =$false)]
+    [bool]$whatif = $false
     ) 
+
+    $Logfile = "D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\lohfile.log"
 
     $context = Get-AzSubscription -SubscriptionName $targetsubscription
     Set-AzContext $context
@@ -31,25 +33,45 @@ function ArmTemplateFunction{
     # check if the resource group exists if it doesn't create it
     if(!(Get-AzResourceGroup $resourceGroup -ErrorAction SilentlyContinue)){
         Write-Host "Create resource group: $resourceGroup" -ForegroundColor Yellow
-        New-AzResourceGroup -Name $resourceGroup -Location $location -Tag @{$creationDate = $creationDate}
+        $provision = New-AzResourceGroup -Name $resourceGroup -Location $location -Tag @{$creationDate = $creationDate}
     }
-    # else{
-    #     Write-Host "$resourceGroup exists." -ForegroundColor Yellow
-    # }
-    # if($WhatIf){
-    #     Write-Host "Running WhatIf" -ForegroundColor Green
-    #     $provision = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'Provision.bicep' -vmName $VM -adminUsername $adminUsername -adminPassword $adminPassword
-    # }
-    # else{
-    #     $provisionVNET = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'VNET-Deployment' -VNetName 'cyberlabVNet' -SubNetName  'cyberlabVMSubnet'
-    #     $VNetID = Get-AzResource -name 'cyberlabVNet' -ResourceGroupName $resourceGroup
+    else{
+        Write-Host "$resourceGroup exists." -ForegroundColor Yellow
+        Add-content $Logfile -value "$resourceGroup exists."
+    }
+    if($WhatIf){
+        Write-Host "Running WhatIf" -ForegroundColor Green
 
-    #     foreach ($VM in $vmNames)
-    #     {
-    #         Write-Host "Running resource provision" -ForegroundColor Green
-    #         $provision = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'Provision.bicep' -vmName $VM -adminUsername $adminUsername -adminPassword $adminPassword -VNetId $VNetID -SubNetName 'cyberlabVMSubnet'
-    #     }
+        $provisionVNET = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\VNET-Deployment.bicep' -VNetName 'cyberlabVNet' -SubNetName  'cyberlabVMSubnet' -WhatIf
+        $VNetID = Get-AzResource -name 'cyberlabVNet' -ResourceGroupName $resourceGroup
 
-    #     return  $provision
-    # }
+        foreach ($VM in $vmNames)
+        {
+            Write-Host "Running resource provision" -ForegroundColor Green
+            $provision = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\Provision.bicep' -vmName $VM -adminUsername $adminUsername -adminPassword $adminPassword -VNetId $VNetID -SubNetName 'cyberlabVMSubnet' -WhatIf
+        }
+    }
+    else{
+
+        try {
+            $provisionVNET = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\VNET-Deployment.bicep' -VNetName 'cyberlabVNet' -SubNetName  'cyberlabVMSubnet'
+
+            
+            Add-content $Logfile -value $provisionVNET
+
+            $VNetID = Get-AzResource -name 'cyberlabVNet' -ResourceGroupName $resourceGroup
+    
+            # foreach ($VM in $vmNames)
+            # {
+            Write-Host "Running resource provision" -ForegroundColor Green
+            $provision = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\Provision.bicep' -vmName $vmNames -adminUsername $adminUsername -adminPassword $adminPassword -VNetId $VNetID.ResourceId -SubNetName 'cyberlabVMSubnet'
+            # }
+        }
+        catch {
+            Add-content $Logfile -value $_.Exception.Message
+            return $_.Exception.Message
+
+        }
+    }
+    
    }

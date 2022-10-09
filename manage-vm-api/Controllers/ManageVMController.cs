@@ -12,7 +12,7 @@ namespace manage_vm_api.Controllers
     public class ManageVMController : ControllerBase
     {
         [HttpPost(Name = "CreateVM")]
-        public IActionResult CreateVM(VirtualMachine virtualMachine)
+        public PSObject CreateVM(VirtualMachine virtualMachine)
         {
             try
             {
@@ -30,22 +30,25 @@ namespace manage_vm_api.Controllers
                                                                     {"adminUserName" ,virtualMachine.adminUserName},
                                                                     {"adminPassword",virtualMachine.adminPassword},
                                                                     {"resourceGroup",virtualMachine.resourceGroup},
-                                                                    {"location",virtualMachine.location}
+                                                                    {"location",virtualMachine.location},
+                                                                    {"vmNames",virtualMachine.vmNames},
+
                                                                         });
 
-                    PowerShellInst.AddParameter("vmNames", virtualMachine.vmNames);
+                    //PowerShellInst.AddParameter("vmNames", virtualMachine.vmNames);
                     foreach (PSObject result in PowerShellInst.Invoke())
                     {
-                        Console.WriteLine(result);
+                        return result;
                     }
                     Console.WriteLine("Done");
                     Console.Read();
-                }
+                }       
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+
             return null;
         }
     }
