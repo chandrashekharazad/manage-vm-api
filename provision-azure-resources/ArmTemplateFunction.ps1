@@ -9,7 +9,7 @@ function ArmTemplateFunction{
     [parameter(mandatory =$true)]
     [string]$location,
     [parameter(mandatory =$true)]
-    [string]$vmnames,
+    [string[]]$vmNames,
     [parameter(mandatory =$false)]
     [string]$targetsubscription,
     [parameter(mandatory =$false)]
@@ -25,7 +25,7 @@ function ArmTemplateFunction{
     Write-Host($adminPassword)
     Write-Host($resourceGroup)
     Write-Host($location)
-    Write-Host($vmName)
+    Write-Host($vmNames)
 
 
     $creationDate = Get-Date -Format "dd/MM/yyyy"
@@ -57,15 +57,16 @@ function ArmTemplateFunction{
             $provisionVNET = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\VNET-Deployment.bicep' -VNetName 'cyberlabVNet' -SubNetName  'cyberlabVMSubnet'
 
             
-            Add-content $Logfile -value $provisionVNET
+            Add-content $Logfile -value $provisionVNET.Outputs
 
             $VNetID = Get-AzResource -name 'cyberlabVNet' -ResourceGroupName $resourceGroup
     
-            # foreach ($VM in $vmNames)
-            # {
-            Write-Host "Running resource provision" -ForegroundColor Green
-            $provision = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\Provision.bicep' -vmName $vmNames -adminUsername $adminUsername -adminPassword $adminPassword -VNetId $VNetID.ResourceId -SubNetName 'cyberlabVMSubnet'
-            # }
+            foreach ($VM in $vmNames)
+            {
+                Add-content $Logfile -value "Creating ${VM}"
+                Write-Host "Running resource provision" -ForegroundColor Green
+                $provision = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\Provision.bicep' -vmName $VM  -adminUsername $adminUsername -adminPassword $adminPassword -VNetId $VNetID.ResourceId -SubNetName 'cyberlabVMSubnet'
+            }
         }
         catch {
             Add-content $Logfile -value $_.Exception.Message

@@ -244,3 +244,13 @@ D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\obj\Debug\net6.0\re
 D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\obj\Debug\net6.0\manage-vm-api.pdb
 D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\obj\Debug\net6.0\manage-vm-api.genruntimeconfig.cache
 D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\obj\Debug\net6.0\ref\manage-vm-api.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\Azure.Core.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\Azure.Identity.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\Azure.ResourceManager.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\Azure.ResourceManager.Compute.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\System.Net.Http.Formatting.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\System.Web.Http.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\Microsoft.Identity.Client.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\Microsoft.Identity.Client.Extensions.Msal.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\manage-vm-api\bin\Debug\net6.0\System.Memory.Data.dll
