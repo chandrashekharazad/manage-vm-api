@@ -1,8 +1,9 @@
+. "D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\Logging.ps1"
 function ArmTemplateFunction{
     param(
    [parameter(mandatory =$true)]
     [string]$adminusername,
-    [parameter(mandatory =$true)]
+    [parameter(mandatory =$true)]   
     [string]$adminpassword,
     [parameter(mandatory =$true)]
    [string]$resourcegroup,
@@ -57,19 +58,19 @@ function ArmTemplateFunction{
             $provisionVNET = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\VNET-Deployment.bicep' -VNetName 'cyberlabVNet' -SubNetName  'cyberlabVMSubnet'
 
             
-            Add-content $Logfile -value $provisionVNET.Outputs
+            Add-Log $provisionVNET.Outputs
 
             $VNetID = Get-AzResource -name 'cyberlabVNet' -ResourceGroupName $resourceGroup
     
             foreach ($VM in $vmNames)
             {
-                Add-content $Logfile -value "Creating ${VM}"
+                Add-Log "Creating ${VM}"
                 Write-Host "Running resource provision" -ForegroundColor Green
                 $provision = New-AzResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile 'D:\Upwork\Azure-VM\manage-vm-api\manage-vm-api\provision-azure-resources\Provision.bicep' -vmName $VM  -adminUsername $adminUsername -adminPassword $adminPassword -VNetId $VNetID.ResourceId -SubNetName 'cyberlabVMSubnet'
             }
         }
         catch {
-            Add-content $Logfile -value $_.Exception.Message
+            Add-Error $_.Exception.Message
             return $_.Exception.Message
 
         }

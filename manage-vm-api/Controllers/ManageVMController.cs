@@ -12,6 +12,7 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.Compute;
 using Azure.ResourceManager.Resources;
 using Azure;
+using System.Xml.Linq;
 
 namespace manage_vm_api.Controllers
 {
@@ -75,40 +76,52 @@ namespace manage_vm_api.Controllers
             return vmList;
         }
 
-        [HttpGet("StopVM")]
-        public async Task<VirtualMachineResource> StopVM()
+        [HttpGet("StartVM")]
+        public async Task<ArmOperation> StartVM(string vmName)
         {
             ArmClient client = new ArmClient(new DefaultAzureCredential());
             string resourceGroupName = "cyberlab003";
             SubscriptionResource subscription = await client.GetDefaultSubscriptionAsync();
             ResourceGroupCollection resourceGroups = subscription.GetResourceGroups();
             ResourceGroupResource resourceGroup = await resourceGroups.GetAsync(resourceGroupName);
-            await foreach (VirtualMachineResource virtualMachine in resourceGroup.GetVirtualMachines())
-            {
-                //previously we would have to take the resourceGroupName and the vmName from the vm object
-                //and pass those into the powerOff method as well as we would need to execute that on a separate compute client
-                await virtualMachine.PowerOffAsync(WaitUntil.Completed);
-            }
 
-            return null;
+            var vm = resourceGroup.GetVirtualMachine(vmName);
+
+            var result = await vm.Value.PowerOnAsync(WaitUntil.Started);
+
+            return result;
+        }
+
+        [HttpPost("StopVM")]
+        public async Task<ArmOperation> StopVM(string vmName)
+        {
+            ArmClient client = new ArmClient(new DefaultAzureCredential());
+            string resourceGroupName = "cyberlab003";
+            SubscriptionResource subscription = await client.GetDefaultSubscriptionAsync();
+            ResourceGroupCollection resourceGroups = subscription.GetResourceGroups();
+            ResourceGroupResource resourceGroup = await resourceGroups.GetAsync(resourceGroupName);
+
+            var vm = resourceGroup.GetVirtualMachine(vmName);
+
+            var result = await vm.Value.PowerOffAsync(WaitUntil.Completed);
+
+            return result;
         }
 
         [HttpGet("DeleteVM")]
-        public async Task<VirtualMachineResource> DeleteVM()
+        public async Task<ArmOperation> DeleteVM(string vmName)
         {
             ArmClient client = new ArmClient(new DefaultAzureCredential());
             string resourceGroupName = "cyberlab003";
             SubscriptionResource subscription = await client.GetDefaultSubscriptionAsync();
             ResourceGroupCollection resourceGroups = subscription.GetResourceGroups();
             ResourceGroupResource resourceGroup = await resourceGroups.GetAsync(resourceGroupName);
-            await foreach (VirtualMachineResource virtualMachine in resourceGroup.GetVirtualMachines())
-            {
-                //previously we would have to take the resourceGroupName and the vmName from the vm object
-                //and pass those into the powerOff method as well as we would need to execute that on a separate compute client
-                await virtualMachine.DeleteAsync(WaitUntil.Completed);
-            }
 
-            return null;
+            var vm = resourceGroup.GetVirtualMachine(vmName);
+
+            var result = await vm.Value.DeleteAsync(WaitUntil.Completed);
+
+            return result;
         }
     }
 }
